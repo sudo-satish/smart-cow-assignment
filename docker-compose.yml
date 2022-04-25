@@ -1,0 +1,52 @@
+version: "3.9"
+services:
+  be-service:
+    env_file:
+      - ./.env
+    build:
+      context: apps/be-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+      MONGO_CONNECTION_URI: "${MONGO_CONNECTION_URI}/smart-cow"
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+  fe-service:
+    env_file:
+      - ./.env
+    build:
+      context: apps/fe-service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - be-service
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+    networks:
+      - app-network
+  mongo:
+    image: mongo
+    networks:
+      - app-network
+    volumes:
+      - ./data/db:/data/db
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
