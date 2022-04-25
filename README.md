@@ -19,5 +19,7 @@ docker-compose build
 ```
 Spin the container
 ```bash
-docker-compose up
+docker-compose up -d
 ```
+
+Visit `http://localhost:3000` to check the home page.
